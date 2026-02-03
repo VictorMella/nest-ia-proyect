@@ -39,7 +39,7 @@ export const orthographyCheckUseCase = async (
         content: prompt,
       },
     ],
-    model: 'gpt-3.5-turbo-1106',
+    model: 'gpt-4o-mini',
     temperature: 0.3,
     max_tokens: 150,
     response_format: {
@@ -47,7 +47,7 @@ export const orthographyCheckUseCase = async (
     },
   });
 
-  // console.log(completion);
+  console.log(completion);
   const jsonResp = JSON.parse(completion.choices[0].message.content);
 
   return jsonResp;
