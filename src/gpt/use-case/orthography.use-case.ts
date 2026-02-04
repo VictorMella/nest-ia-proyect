@@ -16,12 +16,11 @@ export const orthographyCheckUseCase = async (
         role: 'system',
         content: `
         Te serán proveídos textos en español con posibles errores ortográficos y gramaticales,
+        Si viene algo que no sea en español, debes de indicarlo en el mensaje de respuesta.
         Las palabras usadas deben de existir en el diccionario de la Real Academia Española,
         Debes de responder en formato JSON, 
         tu tarea es corregirlos y retornar información soluciones, 
         también debes de dar un porcentaje de acierto por el usuario,
-        
-
         Si no hay errores, debes de retornar un mensaje de felicitaciones.
 
         Ejemplo de salida:
@@ -30,7 +29,12 @@ export const orthographyCheckUseCase = async (
           errors: string[], // ['error -> solución']
           message: string, //  Usa emojis y texto para felicitar al usuario
         }
-        
+        Si encuentras que el texto está en otro idioma, responde:
+        {
+          userScore: 0,
+          errors: [],
+          message: 'El texto proporcionado no está en español. Por favor, envía un texto en español para su corrección.', //Incluye el idioma detectado aca
+        }
         
         `,
       },
@@ -47,7 +51,7 @@ export const orthographyCheckUseCase = async (
     },
   });
 
-  console.log(completion);
+  //console.log(completion);
   const jsonResp = JSON.parse(completion.choices[0].message.content);
 
   return jsonResp;
