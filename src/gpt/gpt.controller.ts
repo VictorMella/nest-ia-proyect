@@ -1,14 +1,17 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   Res,
 } from '@nestjs/common';
 import { GptService } from './gpt.service';
 import { OrthographyDto, ProsConsDiscusserDto, TranslateDto } from './dto';
 import { Response } from 'express';
+import { TextToAudioDto } from './dto/text-to-audio.dto';
 
 @Controller('gpt')
 export class GptController {
@@ -51,5 +54,29 @@ export class GptController {
   @HttpCode(200)
   async translate(@Body() translateDto: TranslateDto) {
     return this.gptService.translate(translateDto);
+  }
+
+  @Post('text-to-audio')
+  @HttpCode(200)
+  async textToAudio(
+    @Body() textToAudioDto: TextToAudioDto,
+    @Res() res: Response,
+  ) {
+    const filePath = await this.gptService.textToAudio(textToAudioDto);
+    res.setHeader('Content-Type', 'audio/mp3');
+    res.status(HttpStatus.OK);
+    res.sendFile(filePath);
+  }
+
+  @Get('text-to-audio/:fileId')
+  @HttpCode(200)
+  async textToAudioGetter(
+    @Res() res: Response,
+    @Param('fileId') fileId: string,
+  ) {
+    const filePath = await this.gptService.textToAudioGetter(fileId);
+    res.setHeader('Content-Type', 'audio/mp3');
+    res.status(HttpStatus.OK);
+    res.sendFile(filePath);
   }
 }
