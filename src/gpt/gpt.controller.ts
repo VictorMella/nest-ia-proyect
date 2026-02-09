@@ -15,7 +15,12 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { GptService } from './gpt.service';
-import { OrthographyDto, ProsConsDiscusserDto, TranslateDto } from './dto';
+import {
+  AudioToTextDto,
+  OrthographyDto,
+  ProsConsDiscusserDto,
+  TranslateDto,
+} from './dto';
 import { Response } from 'express';
 import { TextToAudioDto } from './dto/text-to-audio.dto';
 import { diskStorage } from 'multer';
@@ -113,6 +118,7 @@ export class GptController {
       }),
     )
     file: Express.Multer.File,
+    @Body() audioToTextDto: AudioToTextDto,
   ) {
     const allowedExtensions = [
       '.mp3',
@@ -130,6 +136,6 @@ export class GptController {
         `Invalid file type. Allowed: ${allowedExtensions.join(', ')}`,
       );
     }
-    return this.gptService.audioToText(file);
+    return this.gptService.audioToText(file, audioToTextDto);
   }
 }

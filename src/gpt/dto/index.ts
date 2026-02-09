@@ -1,3 +1,4 @@
 export * from './orthography.dto';
 export * from './prosConsDiscusserDto.dto';
 export * from './translate.dto';
+export * from './audio-to-text.dto';
