@@ -8,9 +8,11 @@ import {
   OrthographyDto,
   ProsConsDiscusserDto,
   TranslateDto,
+  ImageGenerationDto,
 } from './dto';
 import {
   audioToTextUseCase,
+  imageGenerationUseCase,
   orthographyCheckUseCase,
   prosConsDicusserStreamUseCase,
   prosConsDicusserUseCase,
@@ -73,5 +75,22 @@ export class GptService {
   ) {
     const { prompt } = audioToTextDto;
     return await audioToTextUseCase(this.openai, { audioFile, prompt });
+  }
+
+  async imageGeneration(imageGenerationDto: ImageGenerationDto) {
+    return await imageGenerationUseCase(this.openai, { ...imageGenerationDto });
+  }
+
+  async getGeneratedImage(fileName: string) {
+    const folderPath = path.resolve(
+      __dirname,
+      '../../generated/images',
+      `${fileName}`,
+    );
+
+    const wasFound = fs.existsSync(folderPath);
+    if (!wasFound) throw new NotFoundException('Image file not found');
+
+    return folderPath;
   }
 }
