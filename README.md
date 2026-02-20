@@ -1,73 +1,130 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# nestjs-openia — Backend API con NestJS + OpenAI
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend REST construido con **NestJS 10** que expone los servicios de **OpenAI** (GPT-4, TTS, Whisper, DALL·E) al frontend Angular. Corre en el puerto **3000**.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## Tecnologías
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+| Paquete | Versión |
+|---|---|
+| NestJS | ^10 |
+| openai SDK | ^4.23 |
+| multer | ^2 (subida de archivos) |
+| sharp | ^0.34 (procesamiento de imágenes) |
+| body-parser | ^2.2 |
+| class-validator / class-transformer | ^0.14 / ^0.5 |
 
-## Installation
+---
+
+## Requisitos previos
+
+- Node.js ≥ 18
+- Una API Key de OpenAI
+
+---
+
+## Instalación
 
 ```bash
-$ npm install
+npm install
 ```
 
-## Running the app
+---
+
+## Variables de entorno
+
+Crea un archivo `.env` en la raíz de `nestjs-openia/`:
+
+```env
+OPENAI_API_KEY=sk-...
+```
+
+---
+
+## Ejecutar el servidor
 
 ```bash
-# development
-$ npm run start
+# Modo desarrollo (watch)
+npm run start:dev
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+# Modo producción
+npm run start:prod
 ```
 
-## Test
+El servidor quedará disponible en `http://localhost:3000`.
+
+---
+
+## Endpoints de la API
+
+Todos los endpoints están bajo el prefijo `/gpt`.
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| `POST` | `/gpt/orthography-check` | Corrige la ortografía del texto enviado |
+| `POST` | `/gpt/pros-cons-discusser` | Genera pros y contras de un tema (respuesta completa) |
+| `POST` | `/gpt/pros-cons-discusser-stream` | Genera pros y contras con streaming (SSE) |
+| `POST` | `/gpt/translate` | Traduce un texto a un idioma destino |
+| `POST` | `/gpt/text-to-audio` | Convierte texto a audio MP3 (TTS) |
+| `GET`  | `/gpt/text-to-audio/:fileId` | Devuelve un archivo de audio generado previamente |
+| `POST` | `/gpt/audio-to-text` | Transcribe un archivo de audio a texto (Whisper) |
+| `POST` | `/gpt/image-generation` | Genera una imagen con DALL·E |
+| `GET`  | `/gpt/image-generation/:filename` | Devuelve una imagen generada |
+| `POST` | `/gpt/image-variation` | Genera una variación de una imagen existente |
+
+### Notas sobre subida de archivos (`/gpt/audio-to-text`)
+
+- Campo del formulario: `file`
+- Tamaño máximo: **5 MB**
+- Formatos permitidos: `.mp3`, `.m4a`, `.wav`, `.ogg`, `.webm`, `.mpeg`
+- Los archivos subidos se almacenan temporalmente en `generated/uploads/`
+
+---
+
+## Estructura del proyecto
+
+```
+src/
+├── main.ts               # Bootstrap (puerto 3000, CORS habilitado)
+├── app.module.ts
+└── gpt/
+    ├── gpt.controller.ts # Rutas REST
+    ├── gpt.module.ts
+    ├── gpt.service.ts    # Lógica de negocio
+    ├── dto/              # DTOs con validación (class-validator)
+    └── use-case/         # Casos de uso individuales por funcionalidad
+
+generated/
+├── audios/               # Archivos MP3 generados por TTS
+├── images/               # Imágenes generadas por DALL·E
+└── uploads/              # Archivos de audio subidos temporalmente
+```
+
+---
+
+## Scripts disponibles
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm run start         # Producción básica
+npm run start:dev     # Desarrollo con hot-reload
+npm run start:debug   # Desarrollo con debugger
+npm run build         # Compilar a dist/
+npm run lint          # Análisis estático con ESLint
+npm run test          # Tests unitarios con Jest
+npm run test:cov      # Tests con cobertura
+npm run test:e2e      # Tests end-to-end
 ```
 
-## Support
+---
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+# Tests unitarios
+npm run test
 
-## Stay in touch
+# Tests e2e
+npm run test:e2e
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+# Cobertura de tests
+npm run test:cov
+```
