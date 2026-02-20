@@ -16,7 +16,6 @@ export const imageGenerationUseCase = async (
 ) => {
   const { prompt, originalImage, maskImage } = options;
 
-  // Todo: verificar original image
   if (!originalImage || !maskImage) {
     const response = await openai.images.generate({
       prompt: prompt,
@@ -26,8 +25,11 @@ export const imageGenerationUseCase = async (
       quality: 'standard',
       response_format: 'url',
     });
+    //controlar error de respuesta, y que venga la url. Si no, tirar error.
+    if (!response.data || !response.data[0] || !response.data[0].url) {
+      throw new Error('Error generating image');
+    }
 
-    // Todo: guardar la imagen en FS.
     const fileName = await downloadImageAsPng(response.data[0].url, false);
     const url = `${process.env.SERVER_URL}/gpt/image-generation/${fileName}`;
 
@@ -42,7 +44,7 @@ export const imageGenerationUseCase = async (
   const maskPath = await downloadBase64ImageAsPng(maskImage, true);
 
   const response = await openai.images.edit({
-    model: 'dall-e-3',
+    model: 'dall-e-2',
     prompt: prompt,
     image: fs.createReadStream(pngImagePath),
     mask: fs.createReadStream(maskPath),

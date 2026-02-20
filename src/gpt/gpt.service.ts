@@ -9,10 +9,12 @@ import {
   ProsConsDiscusserDto,
   TranslateDto,
   ImageGenerationDto,
+  ImageVariationDto,
 } from './dto';
 import {
   audioToTextUseCase,
   imageGenerationUseCase,
+  imageVariationUseCase,
   orthographyCheckUseCase,
   prosConsDicusserStreamUseCase,
   prosConsDicusserUseCase,
@@ -92,5 +94,9 @@ export class GptService {
     if (!wasFound) throw new NotFoundException('Image file not found');
 
     return folderPath;
+  }
+
+  async geneateImageVariation({ baseImage }: ImageVariationDto) {
+    return imageVariationUseCase(this.openai, { baseImage });
   }
 }
