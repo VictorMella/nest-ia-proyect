@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import OpenAI from 'openai';
+import OpenAI, { toFile } from 'openai';
 import { downloadBase64ImageAsPng, downloadImageAsPng } from 'src/helpers';
 
 interface Options {
@@ -46,8 +46,12 @@ export const imageGenerationUseCase = async (
   const response = await openai.images.edit({
     model: 'dall-e-2',
     prompt: prompt,
-    image: fs.createReadStream(pngImagePath),
-    mask: fs.createReadStream(maskPath),
+    image: await toFile(fs.createReadStream(pngImagePath), null, {
+      type: 'image/png',
+    }),
+    mask: await toFile(fs.createReadStream(maskPath), null, {
+      type: 'image/png',
+    }),
     n: 1,
     size: '1024x1024',
     response_format: 'url',
