@@ -35,7 +35,6 @@ export const orthographyCheckUseCase = async (
           errors: [],
           message: 'El texto proporcionado no está en español. Por favor, envía un texto en español para su corrección.', //Incluye el idioma detectado aca
         }
-        
         `,
       },
       {
@@ -51,7 +50,6 @@ export const orthographyCheckUseCase = async (
     },
   });
 
-  //console.log(completion);
   const jsonResp = JSON.parse(completion.choices[0].message.content);
 
   return jsonResp;

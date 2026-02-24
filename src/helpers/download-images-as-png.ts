@@ -5,9 +5,7 @@ import * as sharp from 'sharp';
 import { InternalServerErrorException } from '@nestjs/common';
 
 export const downloadImageAsPng = async (url: string, fullPath: boolean) => {
-  console.log('Downloading image from URL:', url);
   const response = await fetch(url);
-  console.log('Download response:', response);
 
   if (!response.ok) {
     throw new InternalServerErrorException('Download image was not possible');
